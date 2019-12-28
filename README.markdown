@@ -290,14 +290,28 @@ Author
 * Email: [ryan@quandyfactory.com](mailto:ryan@quandyfactory.com)
 * Repository: [http://github.com/quandyfactory/dicttoxml](http://github.com/quandyfactory/dicttoxml)
 
+* Modified by: Kier von Konigslow
+* Email: [kvonkonigslow@gmail.com](mailto:kvonkonigslow@gmail.com)
+* Repository of fork: [https://github.com/kvonkoni/dicttoxml](https://github.com/kvonkoni/dicttoxml)
+
 Version
 =======
 
-* Version: 1.7.4
-* Release Date: 2016-07-08
+* Version: 1.8.0
+* Release Date: 2019-12-28
 
 Revision History
 ================
+
+Version: 1.8.0
+-------------
+
+* Release Date: 2019-12-28
+* Changes:
+    * Fixed dprecation of collection.Interable
+    * Added XMLtoDict function to parse XMLs
+
+## Forked from Original Repository
 
 Version 1.7.4
 -------------
