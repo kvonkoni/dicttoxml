@@ -11,14 +11,15 @@ This module works with both Python 2 and 3.
 
 from __future__ import unicode_literals
 
-__version__ = '1.7.4'
+__version__ = '1.8.0'
 version = __version__
 
 from random import randint
-import collections
+import collections.abc
 import numbers
 import logging
 from xml.dom.minidom import parseString
+from xml.etree import ElementTree
 
 
 LOG = logging.getLogger("dicttoxml")
@@ -96,7 +97,7 @@ def get_xml_type(val):
         return 'null'
     if isinstance(val, dict):
         return 'dict'
-    if isinstance(val, collections.Iterable):
+    if isinstance(val, collections.abc.Iterable):
         return 'list'
     return type(val).__name__
 
@@ -188,7 +189,7 @@ def convert(obj, ids, attr_type, item_func, cdata, parent='root'):
     if isinstance(obj, dict):
         return convert_dict(obj, ids, parent, attr_type, item_func, cdata)
         
-    if isinstance(obj, collections.Iterable):
+    if isinstance(obj, collections.abc.Iterable):
         return convert_list(obj, ids, parent, attr_type, item_func, cdata)
         
     raise TypeError('Unsupported data type: %s (%s)' % (obj, type(obj).__name__))
@@ -232,7 +233,7 @@ def convert_dict(obj, ids, parent, attr_type, item_func, cdata):
                 )
             )
 
-        elif isinstance(val, collections.Iterable):
+        elif isinstance(val, collections.abc.Iterable):
             if attr_type:
                 attr['type'] = get_xml_type(val)
             addline('<%s%s>%s</%s>' % (
@@ -295,7 +296,7 @@ def convert_list(items, ids, parent, attr_type, item_func, cdata):
                     )
                 )
 
-        elif isinstance(item, collections.Iterable):
+        elif isinstance(item, collections.abc.Iterable):
             if not attr_type:
                 addline('<%s %s>%s</%s>' % (
                     item_name, make_attrstring(attr), 
@@ -398,3 +399,48 @@ def dicttoxml(obj, root=True, custom_root='root', ids=False, attr_type=True,
         addline(convert(obj, ids, attr_type, item_func, cdata, parent=''))
     return ''.join(output).encode('utf-8')
 
+def cast_from_attribute(text, attr):
+    """Converts XML text into a Python data format based on the tag attribute"""
+    if attr == "str":
+        if str(text).lower() != "none":
+            return text
+        else:
+            return ""
+    elif attr == "int":
+        return int(text)
+    elif attr == "float":
+        return float(text)
+    elif attr == "bool":
+        if str(text).lower() == "true":
+            return True
+        elif str(text).lower() == "false":
+            return False
+        else:
+            raise ValueError("bool attribute expected 'true' or 'false'")
+    elif attr == "list":
+        return []
+    elif attr == "dict":
+        return {}
+    elif attr.lower() == "null":
+        return None
+    else:
+        raise TypeError("unsupported type: only 'str', 'int', 'float', 'bool', 'list', 'dict', and 'None' supported")
+
+def xmltodict(obj):
+    """Converts an XML string into a Python object based on eac tag's attribute"""
+    def add_to_output(obj, child):
+        if "type" not in child.attrib:
+            raise ValueError("XML must contain type attributes for each tag")
+        if isinstance(obj, dict):
+            obj.update({child.tag: cast_from_attribute(child.text, child.attrib["type"])})
+            for sub in child:
+                add_to_output(obj[child.tag], sub)
+        elif isinstance(obj, list):
+            obj.append(cast_from_attribute(child.text, child.attrib["type"]))
+            for sub in child:
+                add_to_output(obj[-1], sub)
+    root = ElementTree.fromstring(obj)
+    output = {}
+    for child in root:
+        add_to_output(output, child)
+    return {root.tag: output}

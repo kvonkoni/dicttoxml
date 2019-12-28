@@ -6,6 +6,9 @@ Converts a Python dictionary or other native data type into a valid XML string.
 Details
 =======
 
+DicttoXML
+---------
+
 Supports item (`int`, `float`, `long`, `decimal.Decimal`, `bool`, `str`, `unicode`, `datetime`, `none` and other number-like objects) and collection (`list`, `set`, `tuple` and `dict`, as well as iterable and dict-like objects) data types, with arbitrary nesting for the collections. Items with a `datetime` type are converted to ISO format strings. Items with a `None` type become empty XML elements.
 
 The root object passed into the `dicttoxml` method can be any of the supported data types.
@@ -36,6 +39,24 @@ Note: `datetime` data types are converted into ISO format strings, and `unicode`
 Elements with an unsupported data type raise a TypeError exception. 
 
 If an element name is invalid XML, it is rendered with the name "key" and the invalid name is included as a `name` attribute. E.g. `{ "^.{0,256}$": "foo" }` would be rendered `<key name="^.{0,256}$">foo</key>`. An exception is element names with spaces, which are converted to underscores.
+
+XMLtoDict
+---------
+
+Supports item (`int`, `float`, `bool`, `str`, `none`) and collection (`list`, and `dict`) data types, with arbitrary nesting for the collections.
+
+    XML    -> Python
+    int       int
+    float     float
+    str       str
+    null      None
+    bool      bool
+    list      list
+    dict      dict
+
+Data types are parsed from the type attributes of each element in the XML string. Therefore, type attributes must be enabled (attr_type=True) when creating the XML from DictToXML.
+
+Tip: Since DicttoXML converts the empty string ("") to "none", XMLtoDict will convert "none" to an empty string "". Bear this im mind when using this function to parse an XML.
 
 **This module should work in Python 2.6+ and Python 3.**
 
@@ -269,14 +290,28 @@ Author
 * Email: [ryan@quandyfactory.com](mailto:ryan@quandyfactory.com)
 * Repository: [http://github.com/quandyfactory/dicttoxml](http://github.com/quandyfactory/dicttoxml)
 
+* Modified by: Kier von Konigslow
+* Email: [kvonkonigslow@gmail.com](mailto:kvonkonigslow@gmail.com)
+* Repository of fork: [https://github.com/kvonkoni/dicttoxml](https://github.com/kvonkoni/dicttoxml)
+
 Version
 =======
 
-* Version: 1.7.4
-* Release Date: 2016-07-08
+* Version: 1.8.0
+* Release Date: 2019-12-28
 
 Revision History
 ================
+
+Version: 1.8.0
+-------------
+
+* Release Date: 2019-12-28
+* Changes:
+    * Fixed dprecation of collection.Interable
+    * Added XMLtoDict function to parse XMLs
+
+## Forked from Original Repository
 
 Version 1.7.4
 -------------
