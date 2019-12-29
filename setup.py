@@ -1,6 +1,6 @@
 from distutils.core import setup
 
-version = '1.7.4'
+version = '1.8.1'
 
 with open('README.markdown') as readme:
     long_description = readme.read()
